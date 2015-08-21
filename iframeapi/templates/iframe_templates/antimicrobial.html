@@ -1,0 +1,11 @@
+{% extends 'iframe_templates/base.html' %}
+{% block content %}
+    {% debug %}
+    {% if most_recent %}
+        {% include 'iframe_templates/partials/_antimicrobial_row.html' %}
+    {% else %}
+        {% for object in object_list %}
+            {% include 'iframe_templates/partials/_antimicrobial_row.html' %}
+        {% endfor %}
+    {% endif %}
+{% endblock %}

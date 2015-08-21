@@ -1,0 +1,6 @@
+{{ item.hospital_number }}<br />
+{{ item.name }}<br />
+{% if item.date_of_birth %}
+  {{item.date_of_birth | date:"d/m/y"  }} ({{ item.date_of_birth | age  }})<br />
+{% endif %}
+{{ item.country_of_birth  }} {{ item.ethnicity  }}<br />
