@@ -14,6 +14,8 @@ from iframeapi.tests.models import (
 from iframeapi.templatetags.datefuns import age
 
 HOSPITAL_NUMBER = "AA00"
+CONDITION_1 = "itching"
+CONDITION_2 = "sweating"
 
 
 class TemplateTagTest(TestCase):
@@ -30,7 +32,6 @@ class ModelTests(TestCase):
 
 
 class IframeApiTest(TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.key = ApiKey.objects.create(name="testing")
@@ -39,12 +40,7 @@ class IframeApiTest(TestCase):
             patient=cls.patient,
             hospital_number=HOSPITAL_NUMBER
         )
-        cls.episode_1 = cls.patient.create_episode()
-        cls.episode_1.date_of_episode = date.today() - timedelta(1)
-        cls.episode_1.save()
-        cls.episode_2 = cls.patient.create_episode()
-        cls.episode_2.date_of_episode = date.today()
-        cls.episode_2.save()
+        cls.episode = cls.patient.create_episode()
         cls.client = Client()
         cls.url = reverse("iframe_api")
         super(IframeApiTest, cls).setUpClass()
@@ -73,50 +69,70 @@ class IframeApiTest(TestCase):
             patient=self.patient
         )
         response = self.client.get(self.url, self.get_request_dict())
-        self.assertContains(response, allergy_detail)
 
-    def test_multiple_antimicrobial(self):
-        Antimicrobial.objects.create(
-            dose="dose 1",
-            episode=self.episode_1
-        )
-        Antimicrobial.objects.create(
-            dose="dose 2",
-            episode=self.episode_2
-        )
-        rd = self.get_request_dict(column="antimicrobial")
-        response = self.client.get(self.url, rd)
-        self.assertContains(response, "dose 1")
-        self.assertContains(response, "dose 2")
+        self.assertContains(response, allergy_detail)
 
     def test_demographics(self):
         rd = self.get_request_dict(column="demographics")
         response = self.client.get(self.url, rd)
         self.assertContains(response, HOSPITAL_NUMBER)
 
+    def create_diagnosis(self):
+        today = date.today()
+        yesterday = today - timedelta(1)
+        d1 = Diagnosis.objects.create(
+            condition=CONDITION_1,
+            episode=self.episode,
+            date_of_diagnosis=yesterday
+        )
+        d2 = Diagnosis.objects.create(
+            condition=CONDITION_2,
+            episode=self.episode,
+            date_of_diagnosis=today
+        )
+        return d1, d2
+
     def test_diagnosis(self):
         condition = "itching"
         Diagnosis.objects.create(
             condition=condition,
-            episode=self.episode_1
+            episode=self.episode
         )
         rd = self.get_request_dict(column="diagnosis")
         response = self.client.get(self.url, rd)
         self.assertContains(response, condition)
 
-    def test_most_recent_antimicrobial(self):
+    def test_multiple_results(self):
+        self.create_diagnosis()
+        rd = self.get_request_dict(column="diagnosis")
+        response = self.client.get(self.url, rd)
+        self.assertContains(response, CONDITION_1)
+        self.assertContains(response, CONDITION_2)
+
+    def test_latest(self):
+        self.create_diagnosis()
+        rd = self.get_request_dict(column="diagnosis", latest=True)
+        response = self.client.get(self.url, rd)
+        self.assertContains(response, CONDITION_2)
+        self.assertFalse(CONDITION_1 in response.content)
+
+    def test_no_sort(self):
         Antimicrobial.objects.create(
             dose="dose 1",
-            episode=self.episode_1
+            episode=self.episode
         )
         Antimicrobial.objects.create(
             dose="dose 2",
-            episode=self.episode_2
+            episode=self.episode
         )
-        rd = self.get_request_dict(column="antimicrobial", mostRecent=True)
+        rd = self.get_request_dict(column="antimicrobial", latest=True)
         response = self.client.get(self.url, rd)
 
-        self.assertContains(response, "dose 2")
+        self.assertContains(
+            response,
+            "dose 2",
+        )
+
         self.assertFalse("dose 1" in response)
 
     def test_missing_hospital_number(self):

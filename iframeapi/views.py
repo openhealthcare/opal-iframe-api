@@ -17,7 +17,7 @@ def get_template_name(model):
 def iframe_api(request):
     hospital_number = request.GET.get("hospitalNumber")
     column_name = request.GET.get("column")
-    most_recent = bool(request.GET.get("mostRecent"))
+    latest = bool(request.GET.get("latest"))
 
     try:
         api_key = ApiKey.objects.get(key=request.GET.get("key"))
@@ -42,22 +42,26 @@ def iframe_api(request):
                     episode__patient__demographics__hospital_number=hospital_number
                 )
 
-                if most_recent:
-                    result = result_set.order_by("-episode__date_of_episode").first()
+            if latest:
+                order_by = getattr(model, "_sort", None)
 
-            if result_set is not None:
-                if most_recent:
-                    context = {
-                        "most_recent": most_recent,
-                        "object": result
-                    }
+                if order_by is not None:
+                    result = result_set.order_by(model._sort).last()
                 else:
-                    context=dict(object_list=result_set)
+                    # if not order fall back to the standard object ordering
+                    result = result_set.last()
 
-                return TemplateResponse(
-                    request=request,
-                    template=get_template_name(model),
-                    context=context
-                )
+                context = {
+                    "latest": latest,
+                    "object": result
+                }
+            else:
+                context = dict(object_list=result_set)
+
+            return TemplateResponse(
+                request=request,
+                template=get_template_name(model),
+                context=context
+            )
 
     return HttpResponseBadRequest("missing hospital number or column")

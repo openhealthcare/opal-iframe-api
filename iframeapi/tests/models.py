@@ -16,5 +16,8 @@ class Antimicrobial(opal_models.EpisodeSubrecord):
     dose = models.CharField(max_length=255, blank=True)
     comments = models.TextField(blank=True, null=True)
 
+    class Meta:
+        ordering = ["dose"]
+
 class Diagnosis(opal_models.Diagnosis):
     pass

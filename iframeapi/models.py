@@ -15,8 +15,8 @@ def generate_api_key():
 
 
 class ApiKey(models.Model):
-    key = models.CharField(max_length=KEY_LENGTH, editable=False)
-    name = models.CharField(max_length=255)
+    key = models.CharField(max_length=KEY_LENGTH, editable=False, primary_key=True)
+    name = models.CharField(max_length=255, unique=True)
     last_used = models.DateTimeField(editable=False, null=True, blank=True)
 
     def used(self):
@@ -30,7 +30,7 @@ class ApiKey(models.Model):
                 return key
 
     def save(self, *args, **kwargs):
-        if not self.id:
+        if not self.key:
             self.key = self.get_api_key()
 
         super(ApiKey, self).save(*args, **kwargs)

@@ -1,13 +1,10 @@
 {% extends 'iframe_templates/base.html' %}
 {% block content %}
-    {% for object in object_list %}
-        {{ object.date_of_diagnosis | date:"d/m/y" }}
-        {% if object.provisional %}
-            ?
-        {% endif %}
-        {{ object.condition }}
-        {% if object.details %}
-            ({{ object.details }})
-        {% endif %}
-    {% endfor %}
+    {% if latest %}
+        {% include 'iframe_templates/partials/_diagnosis_row.html' %}
+    {% else %}
+        {% for object in object_list %}
+            {% include 'iframe_templates/partials/_diagnosis_row.html' %}
+        {% endfor %}
+    {% endif %}
 {% endblock %}
