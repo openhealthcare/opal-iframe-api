@@ -3,15 +3,41 @@ Views for the iframeapi OPAL Plugin
 """
 from django.http import HttpResponseBadRequest
 from django.template.response import TemplateResponse
+from django.template.loader import get_template
+from django.template import TemplateDoesNotExist
 from opal.core.search.queries import get_model_from_column_name
 from opal.utils import camelcase_to_underscore
+from django.db import models as django_models
 from opal import models as opal_models
 from iframeapi.models import ApiKey
 
 
 def get_template_name(model):
-    name = camelcase_to_underscore(model.__name__)
-    return ['iframe_templates/{0}.html'.format(name)]
+    model_name = camelcase_to_underscore(model.__name__)
+    template_name = 'iframe_templates/{0}.html'.format(model_name)
+    try:
+        template_name = get_template(template_name).template.name
+        return dict(template=template_name)
+    except TemplateDoesNotExist:
+        return dict(
+            template='iframe_templates/template-not-found.html',
+            status=400
+        )
+
+
+def bad_request(request):
+    column_names = []
+
+    for model in django_models.get_models():
+        if issubclass(model, (opal_models.PatientSubrecord, opal_models.EpisodeSubrecord,)):
+            column_names.append(model.__name__.lower())
+
+    return TemplateResponse(
+        request=request,
+        template="iframe_templates/bad_request.html",
+        context=dict(column_names=column_names),
+        status=400
+    )
 
 
 def iframe_api(request):
@@ -22,7 +48,7 @@ def iframe_api(request):
     try:
         api_key = ApiKey.objects.get(key=request.GET.get("key"))
     except ApiKey.DoesNotExist:
-        return HttpResponseBadRequest("missing or invalid key")
+        return bad_request(request)
 
     api_key.used()
 
@@ -59,10 +85,13 @@ def iframe_api(request):
             else:
                 context = dict(object_list=result_set)
 
-            return TemplateResponse(
-                request=request,
-                template=get_template_name(model),
-                context=context
-            )
+            response_kwargs = {
+                "request": request,
+                "context": context
+            }
 
-    return HttpResponseBadRequest("missing hospital number or column")
+            response_kwargs.update(get_template_name(model))
+
+            return TemplateResponse(**response_kwargs)
+
+    return bad_request(request)

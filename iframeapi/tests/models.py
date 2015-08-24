@@ -19,5 +19,10 @@ class Antimicrobial(opal_models.EpisodeSubrecord):
     class Meta:
         ordering = ["dose"]
 
+
 class Diagnosis(opal_models.Diagnosis):
+    pass
+
+
+class NoTemplate(opal_models.PatientSubrecord):
     pass
