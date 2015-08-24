@@ -4,7 +4,9 @@
         {% include 'iframe_templates/partials/_antimicrobial_row.html' %}
     {% else %}
         {% for object in object_list %}
-            {% include 'iframe_templates/partials/_antimicrobial_row.html' %}
+            <div>
+                {% include 'iframe_templates/partials/_antimicrobial_row.html' %}
+            </div>
         {% endfor %}
     {% endif %}
 {% endblock %}

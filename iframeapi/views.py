@@ -27,6 +27,7 @@ def iframe_api(request):
     api_key.used()
 
     if column_name and hospital_number:
+
         model = get_model_from_column_name(column_name)
 
         if model:
