@@ -1,6 +1,11 @@
-{{ item.hospital_number }}<br />
-{{ item.name }}<br />
-{% if item.date_of_birth %}
-  {{item.date_of_birth | date:"d/m/y"  }} ({{ item.date_of_birth | age  }})<br />
-{% endif %}
-{{ item.country_of_birth  }} {{ item.ethnicity  }}<br />
+{% extends 'iframe_templates/base.html' %}
+{% block content %}
+    {% for object in object_list %}
+        {{ object.hospital_number }}<br />
+        {{ object.name }}<br />
+        {% if object.date_of_birth %}
+          {{ object.date_of_birth | date:"d/m/y" }}<br />
+        {% endif %}
+        {{ object.country_of_birth  }} {{ object.ethnicity  }}<br />
+    {% endfor %}
+{% endblock %}

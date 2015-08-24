@@ -8,7 +8,11 @@ from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from opal.models import Patient
 from iframeapi.models import ApiKey
-from iframeapi.tests.models import Demographics, Allergies, Antimicrobial
+from iframeapi.tests.models import (
+    Demographics, Allergies, Antimicrobial, Diagnosis
+)
+
+HOSPITAL_NUMBER = "AA00"
 
 
 class ModelTests(TestCase):
@@ -26,7 +30,7 @@ class IframeApiTest(TestCase):
         cls.patient = Patient.objects.create()
         cls.demographics = Demographics.objects.create(
             patient=cls.patient,
-            hospital_number="AA00"
+            hospital_number=HOSPITAL_NUMBER
         )
         cls.episode_1 = cls.patient.create_episode()
         cls.episode_1.date_of_episode = date.today() - timedelta(1)
@@ -77,6 +81,21 @@ class IframeApiTest(TestCase):
         response = self.client.get(self.url, rd)
         self.assertContains(response, "dose 1")
         self.assertContains(response, "dose 2")
+
+    def test_demographics(self):
+        rd = self.get_request_dict(column="demographics")
+        response = self.client.get(self.url, rd)
+        self.assertContains(response, HOSPITAL_NUMBER)
+
+    def test_diagnosis(self):
+        condition = "itching"
+        Diagnosis.objects.create(
+            condition=condition,
+            episode=self.episode_1
+        )
+        rd = self.get_request_dict(column="diagnosis")
+        response = self.client.get(self.url, rd)
+        self.assertContains(response, condition)
 
     def test_most_recent_antimicrobial(self):
         Antimicrobial.objects.create(

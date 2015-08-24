@@ -1,8 +1,13 @@
-{{ item.date_of_diagnosis | date:"d/m/y" }}
-{% if item.provisional %}
-    ?
-{% endif %}
-{{ item.condition }}
-{% if item.details %}
-    ({{ item.details }})
-{% endif %}
+{% extends 'iframe_templates/base.html' %}
+{% block content %}
+    {% for object in object_list %}
+        {{ object.date_of_diagnosis | date:"d/m/y" }}
+        {% if object.provisional %}
+            ?
+        {% endif %}
+        {{ object.condition }}
+        {% if object.details %}
+            ({{ object.details }})
+        {% endif %}
+    {% endfor %}
+{% endblock %}
