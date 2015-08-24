@@ -1,9 +1,10 @@
 {% extends 'iframe_templates/base.html' %}
 {% block content %}
-    {% for item in object_list %}
-        {{ item }}
-        <b class="text-danger">{{ item.drug }}</b>
-        {% if item.provisional %}?{% endif %}
-        {% if item.details %}({{ item.details }}){% endif %}
-    {% endfor %}
+    {% if latest %}
+        {% include 'iframe_templates/partials/_allergies_row.html' %}
+    {% else %}
+        {% for object in object_list %}
+            {% include 'iframe_templates/partials/_allergies_row.html' %}
+        {% endfor %}
+    {% endif %}
 {% endblock %}
