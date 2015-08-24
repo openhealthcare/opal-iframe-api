@@ -11,8 +11,15 @@ from iframeapi.models import ApiKey
 from iframeapi.tests.models import (
     Demographics, Allergies, Antimicrobial, Diagnosis
 )
+from iframeapi.templatetags.datefuns import age
 
 HOSPITAL_NUMBER = "AA00"
+
+
+class TemplateTagTest(TestCase):
+    def test_age(self):
+        last_year = date.today() - timedelta(days=370)
+        self.assertEqual(age(last_year), 1)
 
 
 class ModelTests(TestCase):
