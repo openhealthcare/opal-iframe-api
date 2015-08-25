@@ -51,7 +51,7 @@ class IframeApiTest(TestCase):
     def get_request_dict(self, **kwargs):
         request_dict = {
             "hospitalNumber": self.demographics.hospital_number,
-            "column": "allergies",
+            "record": "allergies",
             "key": self.key.key
         }.copy()
 
@@ -75,7 +75,7 @@ class IframeApiTest(TestCase):
         self.assertContains(response, allergy_detail)
 
     def test_demographics(self):
-        rd = self.get_request_dict(column="demographics")
+        rd = self.get_request_dict(record="demographics")
         response = self.client.get(self.url, rd)
         self.assertContains(response, HOSPITAL_NUMBER)
 
@@ -100,20 +100,20 @@ class IframeApiTest(TestCase):
             condition=condition,
             episode=self.episode
         )
-        rd = self.get_request_dict(column="diagnosis")
+        rd = self.get_request_dict(record="diagnosis")
         response = self.client.get(self.url, rd)
         self.assertContains(response, condition)
 
     def test_multiple_results(self):
         self.create_diagnosis()
-        rd = self.get_request_dict(column="diagnosis")
+        rd = self.get_request_dict(record="diagnosis")
         response = self.client.get(self.url, rd)
         self.assertContains(response, CONDITION_1)
         self.assertContains(response, CONDITION_2)
 
     def test_latest(self):
         self.create_diagnosis()
-        rd = self.get_request_dict(column="diagnosis", latest=True)
+        rd = self.get_request_dict(record="diagnosis", latest=True)
         response = self.client.get(self.url, rd)
         self.assertContains(response, CONDITION_2)
         self.assertFalse(CONDITION_1 in response.content)
@@ -127,7 +127,7 @@ class IframeApiTest(TestCase):
             dose="dose 2",
             episode=self.episode
         )
-        rd = self.get_request_dict(column="antimicrobial", latest=True)
+        rd = self.get_request_dict(record="antimicrobial", latest=True)
         response = self.client.get(self.url, rd)
 
         self.assertContains(
@@ -138,15 +138,15 @@ class IframeApiTest(TestCase):
         self.assertFalse("dose 1" in response)
 
     def test_missing_hospital_number(self):
-        rd = self.get_request_dict(column="antimicrobial")
+        rd = self.get_request_dict(record="antimicrobial")
         del rd["hospitalNumber"]
         response = self.client.get(self.url, rd)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.template_name, "iframe_templates/bad_request.html")
 
     def test_missing_column(self):
-        rd = self.get_request_dict(column="antimicrobial")
-        del rd["column"]
+        rd = self.get_request_dict(record="antimicrobial")
+        del rd["record"]
         response = self.client.get(self.url, rd)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.template_name, "iframe_templates/bad_request.html")
@@ -154,7 +154,7 @@ class IframeApiTest(TestCase):
     def test_model_with_no_template(self):
         # if they try and use a model with no template we let the know
         # they're doing it wrong
-        rd = self.get_request_dict(column="notemplate")
+        rd = self.get_request_dict(record="notemplate")
         response = self.client.get(self.url, rd)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.template_name, "iframe_templates/template-not-found.html")

@@ -42,7 +42,7 @@ def bad_request(request):
 
 def iframe_api(request):
     hospital_number = request.GET.get("hospitalNumber")
-    column_name = request.GET.get("column")
+    record_name = request.GET.get("record")
     latest = bool(request.GET.get("latest"))
 
     try:
@@ -52,9 +52,9 @@ def iframe_api(request):
 
     api_key.used()
 
-    if column_name and hospital_number:
+    if record_name and hospital_number:
 
-        model = get_model_from_column_name(column_name)
+        model = get_model_from_column_name(record_name)
 
         if model:
             result_set = None
