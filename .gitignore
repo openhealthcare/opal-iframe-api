@@ -10,3 +10,4 @@ coverage-js
 *~
 *#
 *DS_Store
+/opal_iframe_api.egg-info/
