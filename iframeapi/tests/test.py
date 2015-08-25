@@ -27,7 +27,7 @@ class TemplateTagTest(TestCase):
 class ModelTests(TestCase):
     def test_key_creation(self):
         """ key should be created when the api is created """
-        key = ApiKey.objects.create(name="testing")
+        key = ApiKey.objects.create(name="testing_1")
         self.assertTrue(bool(key.key))
 
 
@@ -37,7 +37,7 @@ class IframeApiTest(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.key = ApiKey.objects.create(name="testing")
+        cls.key = ApiKey.objects.create(name="testing_2")
         cls.patient = Patient.objects.create()
         cls.demographics = Demographics.objects.create(
             patient=cls.patient,
@@ -60,7 +60,6 @@ class IframeApiTest(TestCase):
 
     def test_empty_allergies(self):
         ''' an empty result set return blank html '''
-        ApiKey.objects.create(name="testing")
         response = self.client.get(self.url, self.get_request_dict())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(strip_tags(response.content).strip()), 0)
