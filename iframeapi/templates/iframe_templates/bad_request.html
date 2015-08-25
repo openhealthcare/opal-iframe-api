@@ -1,8 +1,8 @@
 {% extends 'iframe_templates/base.html' %}
 {% block content %}
-<h2>um, something wrong seems to have happened.</h2>
+<h2>Um, something wrong seems to have happened.</h2>
 <h3>
-    this could have happened for one of of 3 reasons
+    This could have happened for one of of 3 reasons
 </h3>
 
 <p>
@@ -16,11 +16,17 @@
     <strong>You need a hospitalNumber arguments and a valid hospital number</strong>
 </p>
 <p>
-    <strong>You need a column name</strong>. The valid column names you can use are
+    <strong>You need a record name</strong>. The valid record names you can use are: 
     <ul>
         {% for column_name in column_names %}
             <li>{{ column_name }}</li>
         {% endfor %}
     </ul>
+</p>
+<p>
+A good request URL looks like e.g.:
+</p>
+<p>
+  /iframeapi/?hospitalNumber=XXXXXXXXXXXX&key=XXXXXXXXXXXXXXX&record=XXXXXXXXXX
 </p>
 {% endblock %}
