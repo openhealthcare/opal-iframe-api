@@ -1,14 +1,14 @@
 """
 Views for the iframeapi OPAL Plugin
 """
+from django.db import models as django_models
 from django.http import HttpResponseBadRequest
-from django.template.response import TemplateResponse
-from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
+from django.template.loader import get_template
+from django.template.response import TemplateResponse
+from opal import models as opal_models
 from opal.core.search.queries import get_model_from_column_name
 from opal.utils import camelcase_to_underscore
-from django.db import models as django_models
-from opal import models as opal_models
 
 
 def get_template_name(model):
