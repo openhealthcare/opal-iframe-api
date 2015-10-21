@@ -9,7 +9,6 @@ from opal.core.search.queries import get_model_from_column_name
 from opal.utils import camelcase_to_underscore
 from django.db import models as django_models
 from opal import models as opal_models
-from iframeapi.models import ApiKey
 
 
 def get_template_name(model):
@@ -41,6 +40,10 @@ def bad_request(request):
 
 
 def iframe_api(request):
+    # This has to be here because Django wants to make sure it's the first
+    # thing to import models and gets distinctly snippish if you beat it.
+    from iframeapi.models import ApiKey
+
     hospital_number = request.GET.get("hospitalNumber")
     record_name = request.GET.get("record")
     latest = bool(request.GET.get("latest"))
