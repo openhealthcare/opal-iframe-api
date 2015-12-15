@@ -1,32 +1,32 @@
-{% extends 'iframe_templates/base.html' %}
+{% extends 'base.html' %}
 {% block content %}
-<h2>Um, something wrong seems to have happened.</h2>
-<h3>
-    This could have happened for one of of 3 reasons
-</h3>
+<div class="content-offset">
 
-<p>
-    <strong>You need a key argument and a valid key</strong>, to create a key click on
-    <a href="{% url 'admin:iframeapi_apikey_add' %}">here</a>, if you don't have
-    access to that, and feel like you should please ping us on
-    <a href="mailto:elcid@openhealthcare.org.uk">elcid@openhealthcare.org.uk</a
-</p>
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3>
+        Something seems to have gone wrong.
+      </h3>
+    </div>
+    <div class="panel-body">
 
-<p>
-    <strong>You need a hospitalNumber arguments and a valid hospital number</strong>
-</p>
-<p>
-    <strong>You need a record name</strong>. The valid record names you can use are: 
-    <ul>
-        {% for column_name in column_names %}
-            <li>{{ column_name }}</li>
-        {% endfor %}
-    </ul>
-</p>
-<p>
-A good request URL looks like e.g.:
-</p>
-<p>
-  /iframeapi/?hospitalNumber=XXXXXXXXXXXX&key=XXXXXXXXXXXXXXX&record=XXXXXXXXXX
-</p>
+      <p>
+        A good request to the Iframe API looks like e.g.:
+      </p>
+      <blockquote>
+        /iframeapi/?hospitalNumber=XXXXXXXXXXXX&key=XXXXXXXXXXXXXXX&record=XXXXXXXXXX
+      </blockquote>
+      <blockquote>
+        /iframeapi/?hospitalNumber=123456789&key=EWQIUOEQWUERWQOIUYOEQWUO&record=demographics
+      </blockquote>
+
+      <p>
+        You need a valid <strong>API key</strong> - if you don't have one, then contact
+        system administrator who can provide you with one.
+      </p>
+      
+    </div> 
+  </div>
+
+</div>
 {% endblock %}
