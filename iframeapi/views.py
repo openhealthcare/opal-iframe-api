@@ -7,7 +7,7 @@ from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.template.response import TemplateResponse
 from opal import models as opal_models
-from opal.core.search.queries import get_model_from_column_name
+from opal.core.subrecords import get_subrecord_from_api_name
 from opal.utils import camelcase_to_underscore
 
 
@@ -57,7 +57,10 @@ def iframe_api(request):
 
     if record_name and hospital_number:
 
-        model = get_model_from_column_name(record_name)
+        try:
+            model = get_subrecord_from_api_name(record_name)
+        except ValueError:
+            model = None
 
         if model:
             result_set = None
