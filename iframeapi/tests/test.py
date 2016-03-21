@@ -151,10 +151,9 @@ class IframeApiTest(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.template_name, "iframe_templates/bad_request.html")
 
-    def test_model_with_no_template(self):
+    def test_model_wrong_record_name(self):
         # if they try and use a model with no template we let the know
         # they're doing it wrong
-        rd = self.get_request_dict(record="notemplate")
+        rd = self.get_request_dict(record="norecord")
         response = self.client.get(self.url, rd)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.template_name, "iframe_templates/template-not-found.html")
+        self.assertEqual(response.status_code, 404)
