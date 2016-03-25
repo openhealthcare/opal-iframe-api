@@ -2,7 +2,7 @@
 Views for the iframeapi OPAL Plugin
 """
 from django.db import models as django_models
-from django.http import HttpResponseBadRequest
+from django.http import Http404
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.template.response import TemplateResponse
@@ -56,48 +56,46 @@ def iframe_api(request):
     api_key.used()
 
     if record_name and hospital_number:
-
         try:
             model = get_subrecord_from_api_name(record_name)
         except ValueError:
-            model = None
+            raise Http404("record {} does not exist".format(record_name))
 
-        if model:
-            result_set = None
+        result_set = None
 
-            if issubclass(model, opal_models.PatientSubrecord):
-                result_set = model.objects.filter(
-                    patient__demographics__hospital_number=hospital_number
-                )
+        if issubclass(model, opal_models.PatientSubrecord):
+            result_set = model.objects.filter(
+                patient__demographics__hospital_number=hospital_number
+            )
 
-            if issubclass(model, opal_models.EpisodeSubrecord):
-                result_set = model.objects.filter(
-                    episode__patient__demographics__hospital_number=hospital_number
-                )
+        if issubclass(model, opal_models.EpisodeSubrecord):
+            result_set = model.objects.filter(
+                episode__patient__demographics__hospital_number=hospital_number
+            )
 
-            if latest:
-                order_by = getattr(model, "_sort", None)
+        if latest:
+            order_by = getattr(model, "_sort", None)
 
-                if order_by is not None:
-                    result = result_set.order_by(model._sort).last()
-                else:
-                    # if not order fall back to the standard object ordering
-                    result = result_set.last()
-
-                context = {
-                    "latest": latest,
-                    "object": result
-                }
+            if order_by is not None:
+                result = result_set.order_by(model._sort).last()
             else:
-                context = dict(object_list=result_set)
+                # if not order fall back to the standard object ordering
+                result = result_set.last()
 
-            response_kwargs = {
-                "request": request,
-                "context": context
+            context = {
+                "latest": latest,
+                "object": result
             }
+        else:
+            context = dict(object_list=result_set)
 
-            response_kwargs.update(get_template_name(model))
+        response_kwargs = {
+            "request": request,
+            "context": context
+        }
 
-            return TemplateResponse(**response_kwargs)
+        response_kwargs.update(get_template_name(model))
+
+        return TemplateResponse(**response_kwargs)
 
     return bad_request(request)
