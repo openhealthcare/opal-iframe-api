@@ -1,5 +1,10 @@
 This is iframeapi - an [OPAL](https://github.com/openhealthcare/opal) plugin.
 
+## ! Important Notice !
+
+This plugin is no longer actively maintiained - as it depends on a version of django that is no longer supported by OPAL
+
+
 This plugin allows you to embed records from an OPAL application in an external application.
 
 For example, you could embed the most recent piece of Clinical Advice given about a patient, or
